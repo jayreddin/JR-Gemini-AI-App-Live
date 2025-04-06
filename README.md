@@ -32,13 +32,13 @@ This started as a simplified version of [Google's original React implementation]
 2. Clone the repository
 
    ```bash
-   git clone https://github.com/ViaAnthroposBenevolentia/gemini-2-live-electron.git
+   git clone https://github.com/jayreddin/JR-Gemini-AI-App-Live.git
    ```
 
 3. Install dependencies:
 
    ```bash
-   cd gemini-2-live-electron
+   cd JR-Gemini-AI-App-Live
    yarn install
    ```
 
