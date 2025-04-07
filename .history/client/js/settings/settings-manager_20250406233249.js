@@ -76,12 +76,12 @@ class SettingsManager {
 
         this.elements.checkGeminiKey.addEventListener('click', async () => {
             const valid = await this.validateApiKey(this.elements.apiKeyInput.value, 'gemini');
-            this.showApiStatus(this.elements.checkGeminiKey, valid);
+            this.elements.checkGeminiKey.style.backgroundColor = valid ? 'green' : 'red';
         });
 
         this.elements.checkDeepgramKey.addEventListener('click', async () => {
             const valid = await this.validateApiKey(this.elements.deepgramApiKeyInput.value, 'deepgram');
-            this.showApiStatus(this.elements.checkDeepgramKey, valid);
+            this.elements.checkDeepgramKey.style.backgroundColor = valid ? 'green' : 'red';
         });
 
         const sliders = [
@@ -114,25 +114,13 @@ class SettingsManager {
                 return res.ok;
             } else if (type === 'deepgram') {
                 const res = await fetch('https://api.deepgram.com/v1/projects', {
-                    headers: { 'Authorization': `Token ${key}` },
-                    mode: 'no-cors'
+                    headers: { 'Authorization': `Token ${key}` }
                 });
-                return true; // opaque response, assume success
+                return res.ok;
             }
         } catch {
             return false;
         }
-    }
-
-    showApiStatus(button, valid) {
-        let status = button.nextElementSibling;
-        if (!status || !status.classList.contains('api-status')) {
-            status = document.createElement('span');
-            status.className = 'api-status';
-            button.insertAdjacentElement('afterend', status);
-        }
-        status.textContent = valid ? '✓' : '✗';
-        status.className = 'api-status ' + (valid ? 'success' : 'fail');
     }
 
     animateSaveButton() {

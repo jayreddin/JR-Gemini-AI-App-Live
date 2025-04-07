@@ -293,134 +293,93 @@ body {
     }
 }
 
-/* Vanilla settings popup styles */
 .settings-dialog {
-  display: none;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background-color: var(--bg-color);
-  border: 1px solid var(--accent-color);
-  border-radius: 12px;
-  padding: 20px;
-  width: 90%;
-  max-width: 500px;
-  max-height: 80vh;
-  overflow-y: auto;
-  z-index: 1001;
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--bg-color);
+    border: 1px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 1001;
 }
 
 .settings-dialog.active {
-  display: block;
+    display: block;
 }
 
 .settings-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
 .settings-overlay.active {
-  display: block;
-}
-
-/* Settings tabs styling */
-.settings-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 12px;
-}
-
-.settings-tabs button {
-  flex: 1;
-  padding: 8px 12px;
-  background-color: var(--button-bg);
-  border: 1px solid var(--accent-color);
-  border-radius: 6px;
-  color: var(--text-color);
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.settings-tabs button:hover {
-  background-color: var(--button-hover);
-}
-
-.settings-tabs button.active {
-  background-color: var(--accent-color);
-  color: #fff;
-}
-
-.tab-panel {
-  margin-bottom: 20px;
+    display: block;
 }
 
 .settings-group {
-  margin-bottom: 16px;
+    margin-bottom: 20px;
 }
 
 .settings-group label {
-  display: block;
-  margin-bottom: 6px;
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-color);
 }
 
-.settings-group input[type="password"],
-.settings-group input[type="range"],
 .settings-group select,
-.settings-group textarea {
-  width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid var(--accent-color);
-  background-color: var(--button-bg);
-  color: var(--text-color);
-  margin-bottom: 8px;
+.settings-group input {
+    width: 100%;
+    padding: 8px;
+    background-color: var(--button-bg);
+    border: 1px solid var(--accent-color);
+    border-radius: 4px;
+    color: var(--text-color);
 }
 
-.settings-group button {
-  margin-top: 5px;
-  padding: 6px 10px;
-  border: none;
-  border-radius: 4px;
-  background-color: var(--accent-color);
-  color: var(--text-color);
-  cursor: pointer;
+.collapsible {
+    background-color: var(--button-bg);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    cursor: pointer;
 }
 
-.api-status {
-  font-size: 18px;
-  margin-left: 8px;
+.collapsible-content {
+    display: none;
+    padding: 10px;
 }
 
-.api-status.success {
-  color: green;
-}
-
-.api-status.fail {
-  color: red;
+.collapsible-content.active {
+    display: block;
 }
 
 .settings-save-btn {
-  width: 100%;
-  padding: 12px;
-  background-color: var(--accent-color);
-  color: var(--text-color);
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background-color: var(--accent-color);
+    color: var(--text-color);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
 }
 
 .settings-save-btn:hover {
-  opacity: 0.9;
+    opacity: 0.9;
 }
 
 .chat-history {
@@ -608,4 +567,97 @@ body {
     .text-input-container {
         bottom: 10px;
     }
+}
+
+/* Settings Material UI redesign */
+.settings-dialog-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: var(--bg-color);
+  border: 1px solid var(--accent-color);
+  border-radius: 12px;
+  padding: 0;
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1001;
+}
+
+.settings-dialog-container.active {
+  display: flex;
+}
+
+.settings-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+
+.settings-overlay.active {
+  display: block;
+}
+
+md-tabs {
+  border-bottom: 1px solid var(--accent-color);
+}
+
+.tab-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  transition: height 0.3s ease;
+}
+
+.tab-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
+md-filled-button.save-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+}
+
+md-icon-button {
+  vertical-align: middle;
+  margin-left: 8px;
+}
+
+/* Optional: style API validation icons */
+md-icon[style*="color: green"] {
+  color: green;
+}
+md-icon[style*="color: red"] {
+  color: red;
+}
+
+/* Style sliders and labels inside tab content */
+.tab-content label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.tab-content select,
+.tab-content md-filled-text-field,
+.tab-content md-slider {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.tab-content span {
+  display: inline-block;
+  margin-bottom: 8px;
 }

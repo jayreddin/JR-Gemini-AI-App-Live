@@ -57,17 +57,6 @@ class SettingsManager {
         this.overlay.addEventListener('click', () => this.hide());
         this.dialog.addEventListener('click', (e) => e.stopPropagation());
 
-        // Tab switching
-        const tabButtons = this.dialog.querySelectorAll('.settings-tabs button');
-        tabButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = btn.dataset.tab;
-                this.dialog.querySelectorAll('.tab-panel').forEach(panel => {
-                    panel.style.display = panel.id === 'tab-' + target ? 'block' : 'none';
-                });
-            });
-        });
-
         this.elements.saveBtn.addEventListener('click', () => {
             this.saveSettings();
             this.animateSaveButton();
@@ -76,12 +65,12 @@ class SettingsManager {
 
         this.elements.checkGeminiKey.addEventListener('click', async () => {
             const valid = await this.validateApiKey(this.elements.apiKeyInput.value, 'gemini');
-            this.showApiStatus(this.elements.checkGeminiKey, valid);
+            this.elements.checkGeminiKey.style.backgroundColor = valid ? 'green' : 'red';
         });
 
         this.elements.checkDeepgramKey.addEventListener('click', async () => {
             const valid = await this.validateApiKey(this.elements.deepgramApiKeyInput.value, 'deepgram');
-            this.showApiStatus(this.elements.checkDeepgramKey, valid);
+            this.elements.checkDeepgramKey.style.backgroundColor = valid ? 'green' : 'red';
         });
 
         const sliders = [
@@ -114,25 +103,13 @@ class SettingsManager {
                 return res.ok;
             } else if (type === 'deepgram') {
                 const res = await fetch('https://api.deepgram.com/v1/projects', {
-                    headers: { 'Authorization': `Token ${key}` },
-                    mode: 'no-cors'
+                    headers: { 'Authorization': `Token ${key}` }
                 });
-                return true; // opaque response, assume success
+                return res.ok;
             }
         } catch {
             return false;
         }
-    }
-
-    showApiStatus(button, valid) {
-        let status = button.nextElementSibling;
-        if (!status || !status.classList.contains('api-status')) {
-            status = document.createElement('span');
-            status.className = 'api-status';
-            button.insertAdjacentElement('afterend', status);
-        }
-        status.textContent = valid ? '✓' : '✗';
-        status.className = 'api-status ' + (valid ? 'success' : 'fail');
     }
 
     animateSaveButton() {

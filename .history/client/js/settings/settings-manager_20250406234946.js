@@ -114,10 +114,9 @@ class SettingsManager {
                 return res.ok;
             } else if (type === 'deepgram') {
                 const res = await fetch('https://api.deepgram.com/v1/projects', {
-                    headers: { 'Authorization': `Token ${key}` },
-                    mode: 'no-cors'
+                    headers: { 'Authorization': `Token ${key}` }
                 });
-                return true; // opaque response, assume success
+                return res.ok;
             }
         } catch {
             return false;

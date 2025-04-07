@@ -9,11 +9,8 @@ class SettingsManager {
 
     initializeElements() {
         this.dialog = document.createElement('div');
-        this.dialog.className = 'settings-dialog';
-
-        // Force insert vanilla HTML template
-        this.dialog.innerHTML = '';
-        this.dialog.insertAdjacentHTML('afterbegin', settingsTemplate);
+        this.dialog.className = 'settings-dialog-container';
+        this.dialog.innerHTML = settingsTemplate;
 
         this.overlay = document.createElement('div');
         this.overlay.className = 'settings-overlay';
@@ -25,6 +22,15 @@ class SettingsManager {
             dialog: this.dialog,
             overlay: this.overlay,
             saveBtn: this.dialog.querySelector('#settingsSaveBtn'),
+            tabs: this.dialog.querySelector('md-tabs'),
+            tabPanels: {
+                api: this.dialog.querySelector('#api-panel'),
+                advanced: this.dialog.querySelector('#advanced-panel'),
+                ui: this.dialog.querySelector('#ui-panel'),
+                audio: this.dialog.querySelector('#audio-panel'),
+                camscrn: this.dialog.querySelector('#camscrn-panel'),
+                misc: this.dialog.querySelector('#misc-panel')
+            },
             apiKeyInput: this.dialog.querySelector('#apiKey'),
             deepgramApiKeyInput: this.dialog.querySelector('#deepgramApiKey'),
             checkGeminiKey: this.dialog.querySelector('#checkGeminiKey'),
@@ -57,14 +63,10 @@ class SettingsManager {
         this.overlay.addEventListener('click', () => this.hide());
         this.dialog.addEventListener('click', (e) => e.stopPropagation());
 
-        // Tab switching
-        const tabButtons = this.dialog.querySelectorAll('.settings-tabs button');
-        tabButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = btn.dataset.tab;
-                this.dialog.querySelectorAll('.tab-panel').forEach(panel => {
-                    panel.style.display = panel.id === 'tab-' + target ? 'block' : 'none';
-                });
+        this.elements.tabs.addEventListener('change', (e) => {
+            const index = e.target.activeTabIndex;
+            Object.values(this.elements.tabPanels).forEach((panel, idx) => {
+                panel.hidden = idx !== index;
             });
         });
 
@@ -76,12 +78,12 @@ class SettingsManager {
 
         this.elements.checkGeminiKey.addEventListener('click', async () => {
             const valid = await this.validateApiKey(this.elements.apiKeyInput.value, 'gemini');
-            this.showApiStatus(this.elements.checkGeminiKey, valid);
+            this.updateCheckIcon(this.elements.checkGeminiKey, valid);
         });
 
         this.elements.checkDeepgramKey.addEventListener('click', async () => {
             const valid = await this.validateApiKey(this.elements.deepgramApiKeyInput.value, 'deepgram');
-            this.showApiStatus(this.elements.checkDeepgramKey, valid);
+            this.updateCheckIcon(this.elements.checkDeepgramKey, valid);
         });
 
         const sliders = [
@@ -114,25 +116,19 @@ class SettingsManager {
                 return res.ok;
             } else if (type === 'deepgram') {
                 const res = await fetch('https://api.deepgram.com/v1/projects', {
-                    headers: { 'Authorization': `Token ${key}` },
-                    mode: 'no-cors'
+                    headers: { 'Authorization': `Token ${key}` }
                 });
-                return true; // opaque response, assume success
+                return res.ok;
             }
         } catch {
             return false;
         }
     }
 
-    showApiStatus(button, valid) {
-        let status = button.nextElementSibling;
-        if (!status || !status.classList.contains('api-status')) {
-            status = document.createElement('span');
-            status.className = 'api-status';
-            button.insertAdjacentElement('afterend', status);
-        }
-        status.textContent = valid ? '✓' : '✗';
-        status.className = 'api-status ' + (valid ? 'success' : 'fail');
+    updateCheckIcon(button, valid) {
+        const icon = button.querySelector('md-icon');
+        icon.textContent = valid ? 'check_circle' : 'cancel';
+        icon.style.color = valid ? 'green' : 'red';
     }
 
     animateSaveButton() {
