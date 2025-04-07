@@ -106,7 +106,6 @@ class SettingsManager {
     }
 
     loadSettings() {
-        // Load values from localStorage
         this.elements.apiKeyInput.value = localStorage.getItem('apiKey') || '';
         this.elements.deepgramApiKeyInput.value = localStorage.getItem('deepgramApiKey') || '';
         this.elements.voiceSelect.value = localStorage.getItem('voiceName') || 'Aoede';
