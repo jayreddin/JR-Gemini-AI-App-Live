@@ -118,7 +118,7 @@ class SettingsManager {
         if (!key) return false;
         try {
             if (type === 'gemini') {
-                const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/models', {
+                const res = await fetch('https://generativelanguage.googleapis.com/v1/models', {
                     headers: { 'Authorization': `Bearer ${key}` }
                 });
                 return res.status === 200;
@@ -135,20 +135,14 @@ class SettingsManager {
     }
 
     showApiStatus(button, valid) {
-        const originalText = 'Check';
-        button.textContent = valid ? '✓' : '✗';
-        if (!valid) button.style.backgroundColor = 'red';
-        else button.style.backgroundColor = '';
-        button.style.transition = 'opacity 0.5s';
-        button.style.opacity = '1';
-        setTimeout(() => {
-            button.style.opacity = '0';
-            setTimeout(() => {
-                button.textContent = originalText;
-                button.style.backgroundColor = '';
-                button.style.opacity = '1';
-            }, 500);
-        }, 800);
+        let status = button.nextElementSibling;
+        if (!status || !status.classList.contains('api-status')) {
+            status = document.createElement('span');
+            status.className = 'api-status';
+            button.insertAdjacentElement('afterend', status);
+        }
+        status.textContent = valid ? '✓' : '✗';
+        status.className = 'api-status ' + (valid ? 'success' : 'fail');
     }
 
     animateSaveButton() {

@@ -11,35 +11,21 @@ export const settingsTemplate = `
 <div class="tab-panel" id="tab-api">
   <div class="settings-group">
     <label for="apiKey">Gemini API Key</label>
-    <div class="api-row">
-      <div class="input-container">
-        <input type="password" id="apiKey" placeholder="Enter your Gemini API key">
-        <button type="button" id="toggleGeminiKey" class="eyeball-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
-      </div>
-      <button id="checkGeminiKey" class="check-btn">Check</button>
+    <div class="input-with-icon">
+      <input type="password" id="apiKey" placeholder="Enter your Gemini API key">
+      <button type="button" id="toggleGeminiKey" class="eyeball-btn">👁️</button>
     </div>
+    <button id="checkGeminiKey" class="check-btn">Check</button>
     <small>Get your Gemini API key <a href="https://makersuite.google.com/app/apikey" target="_blank">here</a>.</small>
   </div>
 
   <div class="settings-group">
     <label for="deepgramApiKey">Deepgram API Key (Optional)</label>
-    <div class="api-row">
-      <div class="input-container">
-        <input type="password" id="deepgramApiKey" placeholder="Enter your Deepgram API key">
-        <button type="button" id="toggleDeepgramKey" class="eyeball-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/>
-            <circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
-      </div>
-      <button id="checkDeepgramKey" class="check-btn">Check</button>
+    <div class="input-with-icon">
+      <input type="password" id="deepgramApiKey" placeholder="Enter your Deepgram API key">
+      <button type="button" id="toggleDeepgramKey" class="eyeball-btn">👁️</button>
     </div>
+    <button id="checkDeepgramKey" class="check-btn">Check</button>
     <small>Get your Deepgram API key <a href="https://console.deepgram.com/signup" target="_blank">here</a>.</small>
   </div>
 </div>

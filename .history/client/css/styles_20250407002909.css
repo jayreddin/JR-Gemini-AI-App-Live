@@ -375,21 +375,21 @@ body {
 .settings-group input[type="range"],
 .settings-group select,
 .settings-group textarea {
-  width: 90%; 
+  width: 100%;
   padding: 8px;
   border-radius: 4px;
   border: 1px solid var(--accent-color);
   background-color: var(--button-bg);
   color: var(--text-color);
-  margin-bottom: 0px;
+  margin-bottom: 8px;
 }
 
 .settings-group button {
-  margin-top: 0px;
+  margin-top: 5px;
   padding: 6px 10px;
   border: none;
   border-radius: 4px;
-  background-color: #4caf50;
+  background-color: var(--accent-color);
   color: var(--text-color);
   cursor: pointer;
 }
@@ -409,13 +409,11 @@ body {
 .input-container {
   position: relative;
   flex: 1;
-  display: flex;
-  align-items: center;
 }
 
 .input-container input {
-  flex: 1;
-  padding-right: 30px;
+  width: 100%;
+  padding-right: 30px; /* space for eyeball */
   box-sizing: border-box;
 }
 
@@ -427,16 +425,14 @@ body {
   background: transparent;
   border: none;
   cursor: pointer;
+  font-size: 16px;
   padding: 0;
+  color: var(--text-color);
   line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .check-btn {
   flex-shrink: 0;
-  min-width: 60px;
   padding: 6px 10px;
   border: none;
   border-radius: 4px;

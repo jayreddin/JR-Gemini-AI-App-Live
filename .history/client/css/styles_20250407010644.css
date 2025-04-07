@@ -375,7 +375,7 @@ body {
 .settings-group input[type="range"],
 .settings-group select,
 .settings-group textarea {
-  width: 90%; 
+  /* width: 80%; */
   padding: 8px;
   border-radius: 4px;
   border: 1px solid var(--accent-color);
@@ -409,34 +409,27 @@ body {
 .input-container {
   position: relative;
   flex: 1;
-  display: flex;
-  align-items: center;
 }
 
 .input-container input {
-  flex: 1;
-  padding-right: 30px;
+  
+  padding-right: 30px; /* space for eyeball */
   box-sizing: border-box;
 }
 
+/* Eyeball icon outline style */
 .eyeball-btn {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
   background: transparent;
   border: none;
+  font-size: 16px;
+  color: var(--text-color);
   cursor: pointer;
   padding: 0;
   line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .check-btn {
   flex-shrink: 0;
-  min-width: 60px;
   padding: 6px 10px;
   border: none;
   border-radius: 4px;
@@ -447,7 +440,6 @@ body {
 }
 
 /* Keep input style consistent when toggling password/text */
-input[type="password"],
 input[type="text"] {
   background-color: var(--button-bg);
   color: var(--text-color);

@@ -118,7 +118,7 @@ class SettingsManager {
         if (!key) return false;
         try {
             if (type === 'gemini') {
-                const res = await fetch('https://generativelanguage.googleapis.com/v1beta/openai/models', {
+                const res = await fetch('https://generativelanguage.googleapis.com/v1/models', {
                     headers: { 'Authorization': `Bearer ${key}` }
                 });
                 return res.status === 200;
