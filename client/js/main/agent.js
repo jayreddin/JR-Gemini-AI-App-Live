@@ -30,6 +30,7 @@ export class GeminiAgent{
 
         this.initialized = false;
         this.connected = false;
+        this._wasStreamingCamera = false; // Track camera state during reconnection
 
         // For audio components
         this.audioContext = null;
@@ -91,13 +92,6 @@ export class GeminiAgent{
             // Get current output mode preference
             let outputMode = localStorage.getItem('outputMode') || 'text';
             
-            // Force text mode if camera or screen sharing is active
-            if (this.cameraInterval || this.screenInterval) {
-                outputMode = 'text';
-                // Update localStorage to reflect this forced change
-                localStorage.setItem('outputMode', 'text');
-            }
-            
             // Only process audio if in audio mode
             if (outputMode === 'audio') {
                 if (!this.audioStreamer.isInitialized) {
@@ -128,27 +122,60 @@ export class GeminiAgent{
             this.emit('interrupted');
         });
 
-        // Add an event handler when the model finishes speaking if needed
         this.client.on('turn_complete', () => {
             console.info('Model finished speaking');
             this.emit('turn_complete');
         });
 
-        // Handle connection state changes
+        // Enhanced connection state handling
         this.client.on('connected', () => {
             console.info('WebSocket connected');
             this.connected = true;
             this.emit('connected');
+            
+            // Restore camera if it was active before disconnect
+            if (this._wasStreamingCamera) {
+                this.startCameraCapture().catch(error => {
+                    console.error('Failed to restore camera stream:', error);
+                });
+            }
         });
 
         this.client.on('disconnected', () => {
             console.info('WebSocket disconnected');
             this.connected = false;
+            
+            // Remember camera state but stop current stream
+            this._wasStreamingCamera = this.cameraInterval !== null;
+            if (this._wasStreamingCamera) {
+                this.stopCameraCapture();
+            }
+            
             this.emit('disconnected');
+        });
+
+        this.client.on('reconnection_failed', () => {
+            console.error('WebSocket reconnection failed after maximum attempts');
+            this._wasStreamingCamera = false; // Reset camera state
+            this.emit('reconnection_failed');
         });
 
         this.client.on('tool_call', async (toolCall) => {
             await this.handleToolCall(toolCall);
+        });
+
+        // Track image sending status
+        this.client.on('image_sent', (status) => {
+            if (!status.success) {
+                console.warn('Failed to send camera image to model');
+            } else {
+                console.debug(`Camera image (${status.size.toFixed(2)}MB) sent successfully`);
+            }
+        });
+
+        // Handle media acknowledgments
+        this.client.on('media_ack', (ack) => {
+            console.debug('Model acknowledged media receipt:', ack);
         });
     }
         
@@ -195,7 +222,23 @@ export class GeminiAgent{
                 if (this.connected && this.client && this.client.isConnected()) {
                     try {
                         const imageBase64 = await this.cameraManager.capture();
-                        this.client.sendImage(imageBase64);
+                        // Add validation for image data
+                        if (!imageBase64) {
+                            console.warn('Camera capture returned empty image');
+                            return;
+                        }
+                        
+                        // Ensure reasonable image size (not too small or large)
+                        const sizeKB = (imageBase64.length * 0.75) / 1024;
+                        if (sizeKB < 1) {
+                            console.warn('Camera image too small, might be invalid');
+                            return;
+                        }
+                        if (sizeKB > 5000) { // 5MB limit
+                            console.warn('Camera image too large, might cause issues');
+                        }
+                        
+                        await this.client.sendImage(imageBase64);
                     } catch (error) {
                         console.warn('Error capturing or sending camera image:', error);
                     }

@@ -1,5 +1,7 @@
 {
     "githubPullRequests.ignoredPullRequestBranches": [
         "main"
-    ]
+    ],
+    "npm-scripts.showStartNotification": false,
+    "liveServer.settings.useLocalIp": true
 }

@@ -20,8 +20,9 @@ export class GeminiWebsocketClient {
         this.isConnecting = false;
         this.connectionPromise = null;
         this.reconnectAttempts = 0;
-        this.maxReconnectAttempts = 3;
-        this.reconnectDelay = 2000; // Start with 2 second delay
+        this.maxReconnectAttempts = 5; // Increased from 3 to 5
+        this.reconnectDelay = 2000;
+        this.wasIntentionallyDisconnected = false;
     }
 
     /**
@@ -81,7 +82,8 @@ export class GeminiWebsocketClient {
                 console.info('🔗 Successfully connected to websocket');
                 this.ws = ws;
                 this.isConnecting = false;
-                this.reconnectAttempts = 0; // Reset reconnect attempts on successful connection
+                this.reconnectAttempts = 0;
+                this.wasIntentionallyDisconnected = false; // Reset intentional disconnect flag
 
                 // Configure
                 this.sendJSON({ setup: this.config });
@@ -108,15 +110,18 @@ export class GeminiWebsocketClient {
                 console.warn(`WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason}`);
                 this.emit('disconnected', { code: event.code, reason: event.reason });
                 
-                // Attempt reconnect if not a normal closure and we haven't exceeded max attempts
-                if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+                // Attempt reconnect if not intentionally disconnected and we haven't exceeded max attempts
+                if (!this.wasIntentionallyDisconnected && event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
                     this.reconnectAttempts++;
-                    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1); // Exponential backoff
+                    const delay = this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts - 1); // Gentler exponential backoff
                     console.info(`Attempting to reconnect in ${delay/1000} seconds... (Attempt ${this.reconnectAttempts} of ${this.maxReconnectAttempts})`);
                     
                     setTimeout(() => {
                         this.connect().catch(err => {
                             console.error('Reconnection failed:', err);
+                            if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+                                this.emit('reconnection_failed');
+                            }
                         });
                     }, delay);
                 }
@@ -140,8 +145,7 @@ export class GeminiWebsocketClient {
      */
     disconnect() {
         if (this.ws) {
-            // Prevent reconnection attempts for intentional disconnection
-            this.reconnectAttempts = this.maxReconnectAttempts;
+            this.wasIntentionallyDisconnected = true; // Mark as intentional disconnect
             
             // Close with normal closure code
             this.ws.close(1000, "User initiated disconnect");
@@ -160,6 +164,19 @@ export class GeminiWebsocketClient {
     async receive(blob) {
         const response = await blobToJSON(blob);
         
+        if (response.setupComplete) {
+            console.debug(`${this.name} setup completed successfully`);
+            this.emit('setup_complete');
+            return;
+        }
+        
+        // Handle image acknowledgment
+        if (response.mediaAck) {
+            console.debug(`${this.name} acknowledged media receipt:`, response.mediaAck);
+            this.emit('media_ack', response.mediaAck);
+            return;
+        }
+
         // Handle tool call responses
         if (response.toolCall) {
             console.debug(`${this.name} received tool call`, response);       
@@ -262,10 +279,23 @@ export class GeminiWebsocketClient {
     async sendImage(base64image) {
         if (!base64image) return;
         
-        const data = { realtimeInput: { mediaChunks: [{ mimeType: 'image/jpeg', data: base64image }] } };
+        const data = { 
+            realtimeInput: { 
+                mediaChunks: [{
+                    mimeType: 'image/jpeg',
+                    data: base64image
+                }]
+            } 
+        };
+        
         const success = this.safelySendJSON(data);
         if (success) {
-            console.debug(`Image with a size of ${Math.round(base64image.length/1024)} KB was sent to the ${this.name}.`);
+            const sizeMB = (base64image.length * 0.75) / (1024 * 1024); // Convert from base64 to MB
+            console.debug(`Image sent to ${this.name}. Size: ${sizeMB.toFixed(2)}MB`);
+            this.emit('image_sent', { success: true, size: sizeMB });
+        } else {
+            console.error(`Failed to send image to ${this.name}`);
+            this.emit('image_sent', { success: false });
         }
     }
 

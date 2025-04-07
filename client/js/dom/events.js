@@ -128,35 +128,23 @@ export function setupEventListeners(agent) {
     
     // Function to update output toggle button based on current state
     const updateOutputToggleIcon = () => {
-        // Check if camera or screen sharing is active, force text mode if so
-        if (isCameraActive || isScreenShareActive) {
-            outputMode = 'text';
-            localStorage.setItem('outputMode', 'text');
-            elements.outputToggleBtn.disabled = true; // Disable the button
-            elements.outputToggleBtn.title = 'Text Replies (Forced when camera/screen is active)';
-        } else {
-            elements.outputToggleBtn.disabled = false; // Enable the button
-        }
+        // Check if camera or screen sharing is active, respect user preference
+        elements.outputToggleBtn.disabled = isCameraActive || isScreenShareActive; // Disable the button if media is active
+        elements.outputToggleBtn.title = elements.outputToggleBtn.disabled ? 
+            'Text Replies (Forced when camera/screen is active)' : 
+            (outputMode === 'text' ? 'Text Replies (Click for Audio)' : 'Audio Replies (Click for Text)');
         
         // Update the button with the appropriate SVG icon based on current mode
         if (outputMode === 'text') {
             elements.outputToggleBtn.innerHTML = '<img src="assets/icons/output-text.svg" alt="Text Mode">';
-            elements.outputToggleBtn.title = elements.outputToggleBtn.disabled ? 
-                'Text Replies (Forced when camera/screen is active)' : 
-                'Text Replies (Click for Audio)';
         } else {
             elements.outputToggleBtn.innerHTML = '<img src="assets/icons/output-audio.svg" alt="Audio Mode">';
-            elements.outputToggleBtn.title = 'Audio Replies (Click for Text)';
         }
     };
     updateOutputToggleIcon();
 
     // Add helper to update output mode when camera/screen state changes
     const updateOutputModeFromMediaState = () => {
-        if (isCameraActive || isScreenShareActive) {
-            outputMode = 'text';
-            localStorage.setItem('outputMode', 'text');
-        }
         updateOutputToggleIcon();
     };
 
