@@ -1,6 +1,14 @@
 const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron')
 const path = require('path')
 
+// Global error handlers
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
 function createWindow () {
     // Create the browser window
     const mainWindow = new BrowserWindow({
@@ -13,8 +21,12 @@ function createWindow () {
         }
     })
 
-    // Load the index.html file from the client folder
-    mainWindow.loadFile(path.join(__dirname, '../client/index.html'))
+    // Load the index.html file from the client folder with error handling
+    try {
+        mainWindow.loadFile(path.join(__dirname, '../client/index.html'))
+    } catch (error) {
+        console.error('Error loading index.html:', error);
+    }
 }
 
 // This method will be called when Electron has finished
@@ -36,6 +48,13 @@ app.on('window-all-closed', function () {
 
 // Handle get sources request
 ipcMain.handle('GET_SOURCES', async (event) => {
+    // IPC security validation: allow only trusted sender(s)
+    const senderURL = event.sender.getURL();
+    if (!senderURL.startsWith('file://') && !senderURL.includes('client/index.html')) {
+        console.warn('Blocked GET_SOURCES request from untrusted sender:', senderURL);
+        throw new Error('Unauthorized IPC request');
+    }
+
     try {
         const sources = await desktopCapturer.getSources({
             types: ['screen', 'window'],
@@ -47,4 +66,4 @@ ipcMain.handle('GET_SOURCES', async (event) => {
         console.error('Error getting sources:', error);
         throw error;
     }
-}) 
+})

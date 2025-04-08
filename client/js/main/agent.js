@@ -201,8 +201,16 @@ export class GeminiAgent{
      * @param {string} text - The text message to send.
      */
     async sendText(text) {
-        await this.client.sendText(text);
-        this.emit('text_sent', text);
+        if (!this.client || !this.client.isConnected || !this.client.isConnected()) {
+            console.warn('Cannot send text: WebSocket client is not connected');
+            return;
+        }
+        try {
+            await this.client.sendText(text);
+            this.emit('text_sent', text);
+        } catch (error) {
+            console.error('Error sending text:', error);
+        }
     }
 
     /**
@@ -470,7 +478,7 @@ export class GeminiAgent{
      * Streams audio data to the model in real-time, handling interruptions
      */
     async initialize() {
-        try {            
+        try {
             // Initialize audio components
             this.audioContext = new AudioContext();
             this.audioStreamer = new AudioStreamer(this.audioContext);
@@ -495,11 +503,15 @@ export class GeminiAgent{
             }
             
             this.initialized = true;
-            console.info(`${this.client.name} initialized successfully`);
+            console.info(`${this.client?.name || 'Client'} initialized successfully`);
             
-            // Send initial welcome message to ensure model responds right away
+            // Send initial welcome message only if client is connected
             setTimeout(() => {
-                this.client.sendText('Hi, I need your help today.');
+                if (this.client && this.client.isConnected && this.client.isConnected()) {
+                    this.client.sendText('Hi, I need your help today.');
+                } else {
+                    console.warn('Skipped sending welcome message: client not connected');
+                }
             }, 500);
         } catch (error) {
             console.error('Initialization error:', error);

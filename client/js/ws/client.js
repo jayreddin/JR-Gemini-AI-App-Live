@@ -306,14 +306,14 @@ export class GeminiWebsocketClient {
      * @param {boolean} endOfTurn - If false model will wait for more input without sending a response.
      */
     async sendText(text, endOfTurn = true) {
-        const formattedText = { 
-            clientContent: { 
+        const formattedText = {
+            clientContent: {
                 turns: [{
-                    role: 'user', 
-                    parts: { text: text } // TODO: Should it be in the list or not?
-                }], 
-                turnComplete: endOfTurn 
-            } 
+                    role: 'user',
+                    parts: [{ text: text }] // Fixed: parts should be an array of objects
+                }],
+                turnComplete: endOfTurn
+            }
         };
         const success = this.safelySendJSON(formattedText);
         if (success) {

@@ -201,20 +201,7 @@ export function makeDraggableAndResizable(element) {
     const resetButton = document.createElement('div');
     resetButton.className = 'reset-position-btn';
     resetButton.innerHTML = '↺';
-    resetButton.style.position = 'absolute';
-    resetButton.style.top = '2px';
-    resetButton.style.right = '2px';
-    resetButton.style.width = '26px';
-    resetButton.style.height = '26px';
-    resetButton.style.borderRadius = '50%';
-    resetButton.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-    resetButton.style.color = 'white';
-    resetButton.style.display = 'flex';
-    resetButton.style.justifyContent = 'center';
-    resetButton.style.alignItems = 'center';
-    resetButton.style.fontSize = '16px';
-    resetButton.style.cursor = 'pointer';
-    resetButton.style.zIndex = '100';
+    resetButton.setAttribute('aria-label', 'Reset position');
     element.appendChild(resetButton);
 
     resetButton.addEventListener('click', (e) => {
@@ -228,11 +215,83 @@ export function makeDraggableAndResizable(element) {
         e.preventDefault();
     }, { passive: false });
 
+    // Add a fullscreen toggle button
+    const fullscreenButton = document.createElement('div');
+    fullscreenButton.className = 'fullscreen-toggle-btn';
+    fullscreenButton.innerHTML = '⛶';
+    fullscreenButton.setAttribute('aria-label', 'Toggle fullscreen');
+    element.appendChild(fullscreenButton);
+
+    let isFullscreen = false;
+    fullscreenButton.addEventListener('click', (e) => {
+        if (!isFullscreen) {
+            element.style.left = '0px';
+            element.style.top = '0px';
+            element.style.width = `${window.innerWidth}px`;
+            element.style.height = `${window.innerHeight}px`;
+            element.style.zIndex = '1000';
+            isFullscreen = true;
+        } else {
+            resetPosition();
+            isFullscreen = false;
+        }
+        e.stopPropagation();
+    });
+
+    fullscreenButton.addEventListener('touchend', (e) => {
+        if (!isFullscreen) {
+            element.style.left = '0px';
+            element.style.top = '0px';
+            element.style.width = `${window.innerWidth}px`;
+            element.style.height = `${window.innerHeight}px`;
+            element.style.zIndex = '1000';
+            isFullscreen = true;
+        } else {
+            resetPosition();
+            isFullscreen = false;
+        }
+        e.stopPropagation();
+        e.preventDefault();
+    }, { passive: false });
+
+    // Enhance drag to snap to edges
+    function snapToEdge() {
+        const snapThreshold = 30; // pixels
+        const rect = element.getBoundingClientRect();
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+
+        if (rect.left < snapThreshold) {
+            element.style.left = '0px';
+        }
+        if (rect.top < snapThreshold) {
+            element.style.top = '0px';
+        }
+        if (windowWidth - rect.right < snapThreshold) {
+            element.style.left = `${windowWidth - rect.width}px`;
+        }
+        if (windowHeight - rect.bottom < snapThreshold) {
+            element.style.top = `${windowHeight - rect.height}px`;
+        }
+    }
+
+    document.addEventListener('mouseup', () => {
+        if (isDragging) {
+            snapToEdge();
+        }
+    });
+
+    document.addEventListener('touchend', () => {
+        if (isDragging) {
+            snapToEdge();
+        }
+    });
+
     // Store position once visible
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-            if (mutation.attributeName === 'style' && 
-                element.style.display !== 'none' && 
+            if (mutation.attributeName === 'style' &&
+                element.style.display !== 'none' &&
                 !originalPosition) {
                 storeOriginalPosition();
             }

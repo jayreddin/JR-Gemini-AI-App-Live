@@ -129,10 +129,8 @@ export function setupEventListeners(agent) {
     // Function to update output toggle button based on current state
     const updateOutputToggleIcon = () => {
         // Check if camera or screen sharing is active, respect user preference
-        elements.outputToggleBtn.disabled = isCameraActive || isScreenShareActive; // Disable the button if media is active
-        elements.outputToggleBtn.title = elements.outputToggleBtn.disabled ? 
-            'Text Replies (Forced when camera/screen is active)' : 
-            (outputMode === 'text' ? 'Text Replies (Click for Audio)' : 'Audio Replies (Click for Text)');
+        elements.outputToggleBtn.disabled = false; // Always enabled
+        elements.outputToggleBtn.title = (outputMode === 'text' ? 'Text Replies (Click for Audio)' : 'Audio Replies (Click for Text)');
         
         // Update the button with the appropriate SVG icon based on current mode
         if (outputMode === 'text') {

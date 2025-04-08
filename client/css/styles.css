@@ -1,10 +1,19 @@
 :root {
-    --bg-color: #1a1a1a;
-    --button-bg: #2d2d2d;
-    --button-hover: #3d3d3d;
-    --text-color: #ffffff;
-    --accent-color: #4CAF50;
-    --danger-color: #ff4444;
+    --bg-color: #121212;
+    --button-bg: #1f1f1f;
+    --button-hover: #333333;
+    --text-color: #f0f0f0;
+    --accent-color: #00bfa5;
+    --danger-color: #ff5252;
+    --font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --font-size-base: 16px;
+    --font-size-small: 14px;
+    --font-size-large: 18px;
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
 }
 
 * {
@@ -36,20 +45,29 @@ body {
 }
 
 .app-container {
-    position: relative;
+    display: grid;
+    grid-template-areas:
+        "power power power"
+        "chat chat chat"
+        "toolbar toolbar toolbar"
+        "input input input"
+        "footer footer footer";
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto 1fr auto auto auto;
     width: 100%;
     height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     overflow: hidden;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    box-sizing: border-box;
+    position: relative;
 }
 
 /* Power button (connect/disconnect) */
 .power-btn {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+    grid-area: power;
+    justify-self: start;
+    align-self: start;
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -94,15 +112,12 @@ body {
 
 /* Bottom toolbar */
 .bottom-toolbar {
-    position: absolute;
-    bottom: 70px;
-    left: 0;
-    right: 0;
+    grid-area: toolbar;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 15px;
-    padding: 10px;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm);
     z-index: 10;
 }
 
@@ -153,12 +168,9 @@ body {
 }
 
 .text-input-container {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-    right: 15px;
+    grid-area: input;
     display: flex;
-    gap: 10px;
+    gap: var(--spacing-sm);
     z-index: 2;
     padding-bottom: env(safe-area-inset-bottom, 15px);
     margin-bottom: env(safe-area-inset-bottom, 0);
@@ -209,57 +221,30 @@ body {
 }
 
 .visualizer {
-    position: absolute;
-    bottom: 0;
-    left: 0;
+    grid-area: chat;
     width: 100%;
     height: 200px;
     z-index: 1;
 }
 
-.camera-preview {
+.camera-preview, .screen-preview {
     position: absolute;
-    bottom: 150px;
-    right: 20px;
-    width: 240px; /* Default width */
+    width: 240px;
     height: 180px;
     background-color: var(--button-bg);
     border: 2px solid var(--accent-color);
     border-radius: 8px;
     overflow: hidden;
-    z-index: 100; /* Increased z-index for better visibility */
-    display: none; /* Hidden by default */
+    z-index: 100;
+    display: none;
     box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
     transition: border-color 0.3s ease;
 }
 
-.camera-preview video {
+.camera-preview video, .screen-preview video {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    background-color: #000;
-}
-
-.screen-preview {
-    position: absolute;
-    bottom: 150px;
-    left: 20px;
-    width: 240px;
-    height: 135px; /* 16:9 aspect ratio */
-    background-color: var(--button-bg);
-    border: 2px solid var(--accent-color);
-    border-radius: 8px;
-    overflow: hidden;
-    z-index: 100; /* Increased z-index for better visibility */
-    display: none; /* Hidden by default */
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.5);
-    transition: border-color 0.3s ease;
-}
-
-.screen-preview video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain; /* Maintain aspect ratio without cropping */
+    object-fit: contain;
     background-color: #000;
 }
 
@@ -397,6 +382,116 @@ body {
 .settings-group small {
   display: block;
   margin-top: 4px;
+}
+/* Footer */
+.app-footer {
+    grid-area: footer;
+    text-align: center;
+    font-size: var(--font-size-small);
+    color: var(--text-color);
+    padding: var(--spacing-sm);
+}
+
+/* Responsive breakpoints */
+@media (max-width: 1024px) {
+    .app-container {
+        grid-template-areas:
+            "power power power"
+            "chat chat chat"
+            "toolbar toolbar toolbar"
+            "input input input"
+            "footer footer footer";
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        grid-template-areas:
+            "power power power"
+            "chat chat chat"
+            "toolbar toolbar toolbar"
+            "input input input"
+            "footer footer footer";
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+    .bottom-toolbar {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .app-container {
+        grid-template-areas:
+            "power"
+            "chat"
+            "toolbar"
+            "input"
+            "footer";
+        grid-template-columns: 1fr;
+    }
+    .bottom-toolbar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    .text-input-container {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+/* Accessibility improvements */
+body {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.5;
+}
+
+button, input, select, textarea {
+    font-family: var(--font-family);
+    font-size: var(--font-size-base);
+}
+
+/* Drag handle, resize handle, reset button, fullscreen button styles */
+.drag-handle {
+    background-color: rgba(0,0,0,0.3);
+    cursor: move;
+}
+
+.resize-handle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 16px;
+    height: 16px;
+    background: rgba(0,0,0,0.5);
+    cursor: se-resize;
+    border-bottom-right-radius: 4px;
+}
+
+.reset-position-btn, .fullscreen-toggle-btn {
+    position: absolute;
+    top: 2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.reset-position-btn {
+    right: 2px;
+}
+
+.fullscreen-toggle-btn {
+    right: 32px;
 }
 
 /* API key row with input and check button inline */
